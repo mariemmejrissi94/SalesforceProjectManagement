@@ -1,0 +1,194 @@
+<aura:component controller="LoginController">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <!-- home1-->
+    <aura:handler name="firstEvent" event="c:MyEvent" action="{!c.handleFirstEvent}" /> 
+    <aura:handler name="secondEvent" event="c:MyEvent" action="{!c.handleSecondEvent}" />
+    <aura:attribute name="isLoggedIn" type="Boolean" default="false" />
+    <!-- homedeveloper-->
+    <aura:handler name="homedevEvent" event="c:MyEvent" action="{!c.handledevEvent}" /> 
+    <aura:handler name="homedev2Event" event="c:MyEvent" action="{!c.handledev2Event}" />
+    <aura:attribute name="isLoggedIn2" type="Boolean" default="false" />
+    <!-- homeproductowner-->
+    <aura:handler name="homeownerEvent" event="c:MyEvent" action="{!c.handleownerEvent}" /> 
+    <aura:handler name="homeowner2Event" event="c:MyEvent" action="{!c.handleowner2Event}" />
+    <aura:attribute name="isLoggedIn3" type="Boolean" default="false" />
+   
+
+    
+    <!-- listprojet-->
+    <aura:handler name="threeEvent" event="c:MyEvent2" action="{!c.handlethreeEvent}" /> 
+    <aura:handler name="fourEvent" event="c:MyEvent2" action="{!c.handlefourEvent}" />
+    <aura:attribute name="listprojet" type="Boolean" default="false" />
+    
+    <!-- listsprint-->
+    <aura:handler name="fiveEvent" event="c:MyEvent2" action="{!c.handlefiveEvent}" /> 
+    <aura:handler name="sixEvent" event="c:MyEvent2" action="{!c.handlesixEvent}" />
+    <aura:attribute name="listsprint" type="Boolean" default="false" />
+    <!--listsprintowner-->
+      <aura:handler name="sprintownerEvent" event="c:MyEvent2" action="{!c.handlesprintownerEvent}" /> 
+    <aura:handler name="sprintownerEvent2" event="c:MyEvent2" action="{!c.handlesprintownerEvent2}" />
+    <aura:attribute name="listsprint2" type="Boolean" default="false" />
+    <!-- listuserstory-->
+    <aura:handler name="sevenEvent" event="c:MyEvent2" action="{!c.handlesevenEvent}" /> 
+    <aura:handler name="eightEvent" event="c:MyEvent2" action="{!c.handleeightEvent}" />
+    <aura:attribute name="listuser" type="Boolean" default="false" />
+    <!-- listtache-->
+    <aura:handler name="nineEvent" event="c:MyEvent2" action="{!c.handlesnineEvent}" /> 
+    <aura:handler name="tenEvent" event="c:MyEvent2" action="{!c.handletenEvent}" />
+    <aura:attribute name="listtache" type="Boolean" default="false" />
+      <!-- listtacheowner-->
+    <aura:handler name="listtacheowner1" event="c:MyEvent2" action="{!c.handlelisttacheowner1Event}" /> 
+    <aura:handler name="listtacheowner2" event="c:MyEvent2" action="{!c.handlelisttacheowner2Event}" />
+    <aura:attribute name="listtacheowner" type="Boolean" default="false" />
+       <!-- listtacheowner-->
+    <aura:handler name="listtachedeveloper1" event="c:MyEvent2" action="{!c.handlelisttachedeveloper1Event}" /> 
+    <aura:handler name="listtachedeveloper2" event="c:MyEvent2" action="{!c.handlelisttachedeveloper2Event}" />
+    <aura:attribute name="listtachedeveloper" type="Boolean" default="false" />
+    <!-- listsoustache-->
+    <aura:handler name="elevenEvent" event="c:MyEvent2" action="{!c.handleselevenEvent}" /> 
+    <aura:handler name="twelveEvent" event="c:MyEvent2" action="{!c.handletwelveEvent}" />
+    <aura:attribute name="liststache" type="Boolean" default="false" />
+    <aura:attribute name="username" type="String" />
+    <!-- stat-->
+    <aura:handler name="thirteenEvent" event="c:MyEvent2" action="{!c.handlethirteenEvent}" /> 
+    <aura:handler name="fourteenEvent" event="c:MyEvent2" action="{!c.fourteenEvent}" />
+    <aura:attribute name="liststat" type="Boolean" default="false" />
+       <!-- statowner-->
+    <aura:handler name="dashowner1Event" event="c:MyEvent2" action="{!c.dashowner1Event}" /> 
+    <aura:handler name="dashowner2Event" event="c:MyEvent2" action="{!c.dashowner2Event}" />
+    <aura:attribute name="dashowner" type="Boolean" default="false" />
+    <!-- DetailProjet-->
+    <aura:handler name="detailprojet1" event="c:MyEvent2" action="{!c.handledetailprojet1}" /> 
+    <aura:handler name="detailprojet2" event="c:MyEvent2" action="{!c.handledetailprojet2}" />
+    <aura:attribute name="detailProjet" type="Boolean" default="false" />
+    <!-- DetailSprint-->
+    <aura:handler name="detailsprint1" event="c:MyEvent2" action="{!c.handledetailsprint1}" /> 
+    <aura:handler name="detailsprint2" event="c:MyEvent2" action="{!c.handledetailsprint2}" />
+    <aura:attribute name="detailsprint" type="Boolean" default="false" />
+    <!-- Detailuser-->
+    <aura:handler name="detailuser1" event="c:MyEvent2" action="{!c.handledetailuser1}" /> 
+    <aura:handler name="detailuser2" event="c:MyEvent2" action="{!c.handledetailuser2}" />
+    <aura:attribute name="detailuser" type="Boolean" default="false" />
+    <!-- Detailtache-->
+    <aura:handler name="detailtache1" event="c:MyEvent2" action="{!c.handledetailtache1}" /> 
+    <aura:handler name="detailtache2" event="c:MyEvent2" action="{!c.handledetailtache2}" />
+    <aura:attribute name="detailtache" type="Boolean" default="false" /> 
+    <!-- detailsoutache-->
+    <aura:handler name="detailsoutache1" event="c:MyEvent2" action="{!c.handledetailsoutache1}" /> 
+    <aura:handler name="detailsoutache2" event="c:MyEvent2" action="{!c.handledetailsoutache2}" />
+    <aura:attribute name="detailsoutache" type="Boolean" default="false" /> 
+    <!-- Kanban-->
+    <aura:handler name="kanban1" event="c:MyEvent2" action="{!c.handledetailkanban1}" /> 
+    <aura:handler name="kanban2" event="c:MyEvent2" action="{!c.handledetailkanban2}" />
+    <aura:attribute name="kanban" type="Boolean" default="false" /> 
+      <!-- Kanban-->
+    <aura:handler name="calendar1" event="c:MyEvent2" action="{!c.handledetailcalendar1}" /> 
+    <aura:handler name="calendar2" event="c:MyEvent2" action="{!c.handledetailcalendar2}" />
+    <aura:attribute name="calendar" type="Boolean" default="false" /> 
+   
+  <aura:if  isTrue="{!or(or(v.isLoggedIn, v.isLoggedIn2),v.isLoggedIn3)}" >
+        <aura:if isTrue="{!v.listprojet}">
+            <c:listprojet/>
+            <aura:set attribute="else">
+                <aura:if isTrue="{!v.detailProjet}">
+                    <c:DetailProjet/>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!v.listsprint}">
+                            <c:ListSprint/>
+                              <aura:set attribute="else">
+                        <aura:if isTrue="{!v.listsprint2}">
+                            <c:ListSprintproductOwner/>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!v.detailsprint}">
+                                    <c:DetailSprint/>
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.listuser}">
+                                            <c:Listuserstory/>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!v.detailuser}">
+                                                    <c:DetailUserstory/>
+                                                    <aura:set attribute="else">
+                                                        <aura:if isTrue="{!v.listtache}">
+                                                            <c:listtache/>
+                                                            <aura:set attribute="else">
+                                                                 <aura:if isTrue="{!v.listtacheowner}">
+                                                            <c:taskowner/>
+                                                                     
+                                                            <aura:set attribute="else">
+                                                                <aura:if isTrue="{!v.detailtache}">
+                                                                    <c:DetailTache/>
+                                                                    <aura:set attribute="else">
+                                                                        <aura:if isTrue="{!v.liststache}">
+                                                                            <c:Listsoutache/>
+                                                                            <aura:set attribute="else">
+                                                                                <aura:if isTrue="{!v.detailsoutache}">
+                                                                                     <c:DetailSoustache/>
+                                                                                    <aura:set attribute="else">
+                                                                                        <aura:if isTrue="{!v.kanban}">
+                                                                                            <c:kanban/>
+                                                                                            <aura:set attribute="else">
+                                                                                                <aura:if isTrue="{!v.liststat}">
+                                                                                                    <c:TaskManagerChart/>
+                                                                                                 <aura:set attribute="else">
+                                                                                                <aura:if isTrue="{!v.dashowner}">
+                                                                                                    <c:dashboardowner/>
+                                                                                                      <aura:set attribute="else">
+                                                                                                <aura:if isTrue="{!v.calendar}">
+                                                                                                    <c:Planning/>
+                                                                                                     <aura:set attribute="else">
+                                                          							       <aura:if isTrue="{!v.listtachedeveloper}">
+                                                          											  <c:taskdeveloper/>
+                                                                                                    <aura:set attribute="else">
+                                                                                                        <aura:if isTrue="{!v.isLoggedIn}">
+                                                                                                            <c:home name="{v.username}"/>
+                                                                                                        </aura:if>
+                                                                                                        <aura:if isTrue="{!v.isLoggedIn2}">
+                                                                                                            <c:homedeveloperteam name="{v.username}"/>
+                                                                                                        </aura:if>
+                                                                                                          <aura:if isTrue="{!v.isLoggedIn3}">
+                                                                                                            <c:homeProductOwner name="{v.username}"/>
+                                                                                                        </aura:if>
+                                                                                                            
+                                                                                                        
+                                                                                                    </aura:set>
+                                                                                                </aura:if>
+                                                                                                 </aura:set>
+                                                                                                </aura:if>
+                                                                                            </aura:set>
+                                                                                        </aura:if>
+                                                                                        </aura:set>
+                                                                                            </aura:if>
+                                                                                        </aura:set>
+                                                                                        </aura:if>
+                                                                                    </aura:set>
+                                                                                </aura:if>
+                                                                        </aura:set>
+                                                                                </aura:if>
+                                                                            </aura:set>
+                                                                        </aura:if> 
+                                                                    </aura:set>
+                                                                </aura:if> 
+                                                            </aura:set>
+                                                             </aura:if> 
+                                                            </aura:set>
+                                                        </aura:if> 
+                                                    </aura:set>
+                                                </aura:if> 
+                                            </aura:set>
+                                        </aura:if> 
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </aura:set>
+        </aura:if>
+        <aura:set attribute="else">
+            <c:login />
+        </aura:set>
+        
+    </aura:if>
+   
+</aura:component>
