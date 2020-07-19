@@ -1,0 +1,720 @@
+<aura:component controller="SprintController" implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride">
+    <!--Declare Attributes-->  
+    <aura:attribute name="ListOfContact" type="Sprint__c[]" />
+    <aura:attribute name="selectedCount" type="integer" default="0"/>
+    <aura:handler name="init" value="{!this}" action="{!c.initRecords}"/>
+    <aura:attribute name="UnfilteredData" type="Contact[]" />  
+    <aura:attribute name="filter" type="String" />  
+    <aura:handler name="change" value="{!v.filter}" action="{!c.doFilter}" />
+    <aura:attribute name="AccountList" type="account[]" description="store account records list"/>
+    <aura:attribute name="showSaveCancelBtn" type="boolean" default="false" description="flag for rendered save and cancel buttons in aura:if "/>
+    <aura:attribute name="searchResult" type="List" description="use for store and display account list return from server"/>
+    <aura:attribute name="searchKeyword" type="String" description="use for store user search input"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    <aura:attribute name="TotalNumberOfRecord" type="integer" default="0" description="use for display Number of records"/>
+    <aura:attribute name="selectedaccId" type="Id" />
+    <aura:handler name="init" value="{!this}" action="{!c.loadContactList}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/> 
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOpene" type="boolean" default="false"/>
+    <aura:attribute name="isOpenee" type="boolean" default="false"/>
+    <!--aura init handler , call js "loadContactList" function on component load, and display contact data on table-->   
+    <aura:handler name="init" value="{!this}" action="{!c.loadContactList}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/> 
+    <aura:attribute name="todocolumns" type="List"/>
+    <aura:attribute name="objToDo" type="Sprint__c" default="{'sobjectType' : 'Sprint__c'}"/>
+    <aura:attribute name="objToDoo" type="UserStory__c" default="{'sobjectType' : 'UserStory__c'}"/>
+    <aura:attribute name="EditProjet" type="Sprint__c" default="{'sobjectType' : 'Sprint__c'}"/>
+    <aura:attribute name="picklistValues" type="object" />
+    <aura:attribute name="picklistValue" type="object" />
+    <c:PicklistValues sObjectName="Sprint__c" fieldName="Etat__c" picklistValues="{!v.picklistValues}" />
+    <c:PicklistValues sObjectName="UserStory__c" fieldName="etat__c" picklistValues="{!v.picklistValue}" />
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:attribute name="selectedLookUpRecordproj" type="sObject" default="{}"/>
+    <aura:attribute name="selectedLookUpRecordres" type="sObject" default="{}"/>
+    <aura:attribute name="selectedLookUpRecorde" type="sObject" default="{}"/>
+    <aura:attribute name="selectedLookUpRecordee" type="sObject" default="{}"/>
+    <aura:attribute name="selectedLookUpRecordeee" type="sObject" default="{}"/>
+    <aura:attribute name="showConfirmDialog" type="boolean" default="false"/>
+    <aura:registerEvent name="sixEvent" type="c:MyEvent2" />
+      <aura:registerEvent name="sevenEvent" type="c:MyEvent2" />
+    <aura:registerEvent name="detailsprint1" type="c:MyEvent2" />
+    <aura:attribute name="hide" type="boolean" default="true"/>
+     <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+      <aura:attribute name="isModalOpen2" type="boolean" default="false"/>
+          <aura:attribute name="ShowProjet" type="Sprint__c" default="{'sobjectType' : 'Sprint__c'}"/>
+       <aura:attribute name="isOpenn" type="boolean" default="false"/>
+        <aura:attribute name="isModalOpen3" type="boolean" default="false"/>
+       <aura:attribute name="user" type="List"/>
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleComponentEvent}"/>
+ 
+    <div>
+        <br/>
+        
+        <br/> 
+        
+        
+        <lightning:layout multipleRows="true">
+            
+            <lightning:layoutItem size="12" padding="around-small">
+                <div class="slds-grid slds-grid--align-left" > 
+                    <lightning:buttonIcon iconName="utility:chevronleft" variant="bare" onclick="{! c.handleClick }" /> &nbsp;
+                    
+                    <div class="slds-text-heading_small slds-text-color_default"><center><b>Retour</b></center></div>  
+                </div>
+                
+                <br/>       <br/>
+              
+                <lightning:card >
+                    
+                    
+                    
+                    
+                    
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem padding="around-small" size="2">
+                            <c:collapseSec/>
+                        </lightning:layoutItem>
+                        
+                        <lightning:layoutItem padding="around-small" size="7">
+                            <div class="slds-box slds-theme_shade">
+                                <div class="slds-text-heading_large">
+                                    <img src="{!$Resource.sprint2}" class="img-fluid" alt="Responsive image" /> 
+                                    Liste des sprints</div>
+                                <div class="slds-grid slds-grid--align-end" > 
+                                    
+                                    <!--<lightning:button class="slds-button slds-theme_success  slds-button__icon_medium" iconName="utility:new_window"  iconPosition="left"  label=" Ajout" title="Create New..." onclick="{!c.gotoURL}" />-->
+                                    
+                                    
+                                </div>
+                            </div>
+                            
+                            
+                            <br/>   <br/>
+                            <div class="slds-grid slds-grid--align-end"> 
+                                <lightning:input name="x" value="{!v.filter}" label="" placeholder="Chercher cette liste" type="search"/>
+                                <br/> <br/>    <br/>
+                            </div>
+                            <span class="slds-badge">Vous avez séléctionné: &nbsp;{!v.selectedCount}</span>
+                            <br/><br/>     
+                            
+                            
+                            <table class="slds-table slds-table--bordered slds-table--striped">
+                                
+                                <thead>
+                                    <tr class="slds-text-title--caps">
+                                        <th style="width:3.25rem;" class="slds-text-align--right">
+                                            <div class="slds-form-element">
+                                                <div class="slds-form-element__control">
+                                                    <label class="slds-checkbox">
+                                                        <!--header checkbox for select all-->
+                                                        <ui:inputCheckbox aura:id="box3" change="{!c.selectAll}"/>
+                                                        <span class="slds-checkbox--faux"></span>
+                                                        <span class="slds-form-element__label text"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            
+                                            <span class="slds-truncate" title="Name">Nom</span>      
+                                        </th>
+                              <th >
+                                            <div class="slds-truncate" title="">Etat</div>
+                                        </th>
+                                        <th >
+                                            <div class="slds-truncate" title="">Priorité</div>
+                                        </th>
+                                        <th >
+                                            <div class="slds-truncate" title="">Projet</div>
+                                        </th>
+                                        <!--<th >
+                                            <div class="slds-truncate" title="">Responsable</div>
+                                        </th>
+                                          -->
+                                        <th >
+                                            <div class="slds-truncate" title=""></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <!--table body start, 
+                       Iterate contact list as a <tr>
+                       -->
+                                <tbody>
+                                    <aura:iteration items="{!v.ListOfContact}" var="con" indexVar="rowIndex">
+                                        <tr>
+                                            <td scope="row" class="slds-text-align--right" style="width:3.25rem;">
+                                                <div class="slds-form-element">
+                                                    <div class="slds-form-element__control">
+                                                        <label class="slds-checkbox">
+                                                            <ui:inputCheckbox text="{!con.Id}" aura:id="boxPack" value="" change="{!c.checkboxSelect}"/>
+                                                            <span class="slds-checkbox--faux"></span>
+                                                            <span class="slds-form-element__label text"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            
+                                            
+                                            <td scope="row" size="4">
+                                                <button type="button" class="btn btn-link" onclick="{!c.detailsprint}"> <center>{!con.Name}</center></button>
+                                                
+                                                
+                                            </td>
+                                            <!--
+                             <td scope="row">
+                                <div class="slds-truncate" title="{!con.LastName}">{!con.Description_projet__c}</div>
+                             </td>
+                             <td scope="row">
+                                 <div class="slds-truncate" title="{!con.MobilePhone}">{!con.date_debut__c}</div>
+                             </td>
+                             <td scope="row">
+                                 <div class="slds-truncate" title="{!con.Department}">{!con.date_fin__c}</div>      
+                             </td>
+                               -->
+                                            <td scope="row" size="6">
+                                                <center><span class="badge_lightest"> <aura:unescapedHtml value="{!con.iconstatus__c}"  />{!con.Etat__c}</span></center>
+                                            </td>
+                                            <td scope="row" size="6">
+                                                <center><span class="badge_lightest">    <aura:unescapedHtml value="{!con.staricon__c}"  /> </span></center>      
+                                            </td>
+                                            
+                                            <td scope="row" size="4">
+                                                <center>{!con.Projet__r.Name}</center>
+                                                
+                                            </td>
+                                            <!--<td scope="row" size="4">
+                                                <center>{!con.Ressource__r.Name}</center>
+                                                
+                                            </td> -->
+                                            <td>
+                                                
+                                                <ul class="slds-button-group-row">
+                                                    
+                                                    <li>
+                                                        
+                                                        <button class="slds-button slds-button_neutral-xx-small" onclick="{!c.editprojet}"  id="{!con.Id}"> <lightning:icon iconName="standard:record_update"/>  </button> &nbsp; &nbsp;
+                                                        
+                                                    </li>
+                                                    <li>
+                                                        <button class="slds-button slds-button_neutral-xx-small" onclick="{!c.handleConfirmDialog}"> <lightning:icon iconName="standard:record_delete"/>  </button> &nbsp; &nbsp;
+                                                        
+                                                        
+                                                        
+                                                    </li>
+                                                    
+                                                    <li>
+                                                        <button class="slds-button slds-button_neutral-xx-small" onclick="{!c.gotoURLe}"> <lightning:icon iconName="standard:record_create"/>  </button> &nbsp; &nbsp;
+                                                        
+                                                        
+                                                    </li>
+                                                     <li>
+                                                            <button class="slds-button slds-button_neutral-xx-small"  id="{!con.Id}" onclick="{!c.detailprojet2}"> <lightning:icon iconName="standard:record_lookup"/>  </button>
+                                                            
+                                                            
+                                                        </li>
+                                                    
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                            
+                            <aura:if isTrue="{!v.showConfirmDialog}">
+                                <!--Modal Box Start-->
+                                <div role="dialog" class="slds-modal slds-fade-in-open ">
+                                    <div class="slds-modal__container">
+                                        <!--Modal Box Header Start-->
+                                         <header class="slds-box slds-theme--warning">
+                        
+                          <div class="slds-align_absolute-center"><h1 class="slds-text-heading--medium">
+                              Suppression d'un Sprint </h1>
+                        </div>
+                    </header>
+                                        <!--Modal Box Header End-->
+                                        
+                                        <!--Modal Box Content Start-->
+                                        <div class="slds-modal__content slds-p-around--medium">
+                                            <center><img src="{!$Resource.alert}" class="img-fluid" alt="Responsive image" />&nbsp;
+                                                
+                                                <b> user stories , taches , sous taches  de ce sprint seront supprimés</b> <br/>
+                                                Voulez vous vraiment supprimer ce sprint ? 
+                                            </center>
+                                            
+                                        </div>
+                                        <!--Modal Box Content End-->
+                                        
+                                        <!--Modal Box Button Start-->
+                                        <footer class="slds-modal__footer">
+                                            <button type="button" class="btn btn-danger"  onclick='{!c.handleConfirmDialogNo}'>Nom</button>&nbsp;&nbsp;
+                                            
+                                            <button type="button" class="btn btn-info"  onclick='{!c.handleConfirmDialogYes}'> Oui</button>
+                                            
+                                        </footer>
+                                        <!--Modal Box Button End-->
+                                    </div>
+                                </div>
+                                <div class="slds-backdrop slds-backdrop--open"></div>            
+                            </aura:if>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" size="3">
+                            <c:customActivityy/>
+                            
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:card>
+            </lightning:layoutItem>
+            
+        </lightning:layout>
+        
+        <aura:if isTrue="{!v.isOpen}">
+            
+            <!--###### MODAL BOX Start######--> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- ###### MODAL BOX HEADER Start ######-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Edit Sprint</h2>
+                    </header>
+                    <!--###### MODAL BOX BODY Part Start######-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-modal__content">
+                            <h3 class="slds-section-title--divider">Détail Sprint</h3>
+                            <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                   
+                                        <lightning:input class="slds-hide" aura:id="InputId" label="Id" value="{!v.EditProjet.Id}"/>
+                                        
+                                        
+                                        <lightning:input aura:id="Name" label="Nom Sprint" value="{!v.EditProjet.Name}"/>
+                                        <lightning:textarea aura:id="desc" label="Description Sprint" value="{!v.EditProjet.description_sprint__c}"/>
+                                        <lightning:input type="Date" aura:id="datedeb" label="date début" value="{!v.EditProjet.date_debut__c}"/>
+                                        <lightning:input  type="Date" aura:id="datefin" label="date fin" value="{!v.EditProjet.date_fin__c}"/>
+                                        <lightning:input aura:id="priorite" label="Priorité" value="{!v.EditProjet.priorite__c}"/>
+                                            
+                                        <lightning:select aura:id="etat" name="Etat" label="Etat" onchange="{!c.getSelectedValueee}">
+                                            <aura:iteration items="{!v.picklistValues}" var="item"> 
+                                                <aura:if isTrue="{!v.EditProjet.Etat__c == item }"> 
+                                                    <option value="{!item.value}" text="{!item.label}" selected="{!item.value}"></option> 
+                                                    <aura:set attribute="else"> 
+                                                        <option value="{!item.value}" text="{!item.label}" selected="{!item.value}"></option>  
+                                                    </aura:set> 
+                                                </aura:if> 
+                                            </aura:iteration>
+                                        </lightning:select>
+                                            
+                                        <c:customLookup objectAPIName="Projet__c" IconName="standard:document" selectedRecord="{!v.selectedLookUpRecordproj}" label="Projet"/>
+                                        
+                                        <!--<c:customLookup objectAPIName="Ressource__c" IconName="standard:user_role" selectedRecord="{!v.selectedLookUpRecordres}" label="Responsable"/>-->
+                                        
+                                      
+
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <!--###### MODAL BOX FOOTER Part Start ######-->
+                    <footer class="slds-modal__footer">
+                        <button type="button" class="btn btn-danger"  onclick="{! c.closeModel }">Cancel</button>&nbsp;&nbsp;
+                        
+                        <button type="button" class="btn btn-info"  onclick="{! c.likenClose }"> Save</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            <!--###### MODAL BOX Part END Here ######-->
+            
+        </aura:if>
+        <aura:if isTrue="{!v.isOpene}">
+            
+            <!--###### MODAL BOX Start######--> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- ###### MODAL BOX HEADER Start ######-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModele }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Ajout Sprint</h2>
+                    </header>
+                    <!--###### MODAL BOX BODY Part Start######-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-modal__content">
+                            <h3 class="slds-section-title--divider">Détail Sprint</h3>
+                            <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="todoForm"
+                                                         type="Text"
+                                                         label="Titre"
+                                                         value="{!v.objToDo.Name}"
+                                                         required="true"
+                                                         messageWhenValueMissing="Entrer Titre"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element">
+                                    
+                                    <div class="slds-form-element__control">
+                                        <lightning:textarea aura:id="todoForm"
+                                                            type="String"
+                                                            label="Description Sprint"
+                                                            value="{!v.objToDo.description_sprint__c}"
+                                                            required="true"
+                                                            messageWhenValueMissing="Enter description" />
+                                    </div>
+                                </div>
+                                <div class="slds-form-element">
+                                    
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="todoForm"
+                                                         type="Date"
+                                                         label="date début"
+                                                         value="{!v.objToDo.date_debut__c}"
+                                                         messageWhenValueMissing="date début"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element">
+                                    
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="todoForm"
+                                                         type="Date"
+                                                         label="date fin"
+                                                         value="{!v.objToDo.date_fin__c}"
+                                                         messageWhenValueMissing="date fin"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element">
+                                    
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="todoForm"
+                                                         type="number"
+                                                         label="Priorité "
+                                                         value="{!v.objToDo.priorite__c}"
+                                                         required="true"
+                                                         messageWhenValueMissing="Entrer priorité"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-form-element slds-m-top--medium large">
+                                    
+                                    <div class="slds-select_container">
+                                        <lightning:select aura:id="ProjectField" name="Etat" label="Etat" onchange="{!c.getSelectedValue}">
+                                            {!v.objToDo.Etat__c}
+                                            <aura:iteration items="{!v.picklistValues}" var="item"> 
+                                                <aura:if isTrue="{!v.objToDo.Etat__c == item }"> 
+                                                    test1
+                                                    <option value="{!item.value}" text="{!item.label}" selected="{!item.value}"></option> 
+                                                    <aura:set attribute="else"> 
+                                                        test2
+                                                        <option value="{!item.value}" text="{!item.label}" selected="{!item.value}"></option>  
+                                                    </aura:set> 
+                                                </aura:if> 
+                                            </aura:iteration> 
+                                            
+                                        </lightning:select>
+                                        
+                                        <c:customLookup objectAPIName="Projet__c" IconName="standard:document" selectedRecord="{!v.selectedLookUpRecord}" label="Projet"/>
+                                        
+                                        <c:customLookup objectAPIName="Ressource__c" IconName="standard:user_role" selectedRecord="{!v.selectedLookUpRecorde}" label="Responsable"/>
+                                        
+                                        
+                                        
+                                        
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button type="button" class="btn btn-danger"  onclick="{! c.closeModele }">Cancel</button>&nbsp;&nbsp;
+                        
+                        <button type="button" class="btn btn-info"  onclick="{! c.likenClosee }"> Save</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            <!--###### MODAL BOX Part END Here ######-->
+            
+        </aura:if>
+        
+        <aura:if isTrue="{!v.isOpenee}">
+            
+            <!--###### MODAL BOX Start######--> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- ###### MODAL BOX HEADER Start ######-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModelee }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Ajout user story</h2>
+                    </header>
+                    <!--###### MODAL BOX BODY Part Start######-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-modal__content">
+                            <h3 class="slds-section-title--divider">Détail user story</h3>
+                            <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="todoForm"
+                                                         type="Text"
+                                                         label="Titre"
+                                                         value="{!v.objToDoo.Name}"
+                                                         required="true"
+                                                         messageWhenValueMissing="Entrer Titre"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element">
+                                    
+                                    <div class="slds-form-element__control">
+                                        <lightning:textarea aura:id="todoForm"
+                                                            type="String"
+                                                            label="Description user story"
+                                                            value="{!v.objToDoo.description_userstory__c}"
+                                                            required="true"
+                                                            messageWhenValueMissing="Enter description" />
+                                    </div>
+                                </div>
+                                <div class="slds-form-element">
+                                    
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="todoForm"
+                                                         type="Date"
+                                                         label="date début"
+                                                         value="{!v.objToDoo.date_debut__c}"
+                                                         messageWhenValueMissing="date début"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element">
+                                    
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="todoForm"
+                                                         type="Date"
+                                                         label="date fin"
+                                                         value="{!v.objToDoo.date_fin__c}"
+                                                         messageWhenValueMissing="date fin"/>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element">
+                                    
+                                    <div class="slds-form-element__control">
+                                        <lightning:input aura:id="todoForm"
+                                                         type="number"
+                                                         label="Priorité "
+                                                         value="{!v.objToDoo.priorite__c}"
+                                                         required="true"
+                                                         messageWhenValueMissing="Entrer priorité"/>
+                                    </div>
+                                </div>
+                                
+                                <lightning:select aura:id="ProjectFielde" name="Etat" label="Etat" onchange="{!c.getSelectedValuee}">
+                                    {!v.objToDoo.etat__c}
+                                    <aura:iteration items="{!v.picklistValue}" var="item"> 
+                                        <aura:if isTrue="{!v.objToDoo.etat__c == item }"> 
+                                            <option value="{!item.value}" text="{!item.label}" selected="{!item.value}"></option> 
+                                            <aura:set attribute="else"> 
+                                                <option value="{!item.value}" text="{!item.label}" selected="{!item.value}"></option>  
+                                            </aura:set> 
+                                        </aura:if> 
+                                    </aura:iteration> 
+                                    
+                                </lightning:select>
+                                <c:customLookup objectAPIName="Sprint__c" IconName="standard:contact_list" selectedRecord="{!v.selectedLookUpRecordee}" label="Sprint"/>
+                                <!--<c:customLookup objectAPIName="Ressource__c" IconName="standard:user_role" selectedRecord="{!v.selectedLookUpRecordeee}" label="Responsable"/>-->
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button type="button" class="btn btn-danger"  onclick="{! c.closeModelee }">Cancel</button>&nbsp;&nbsp;
+                        
+                        <button type="button" class="btn btn-info"  onclick="{! c.likenCloseee }"> Save</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            <!--###### MODAL BOX Part END Here ######-->
+            
+        </aura:if>
+      <aura:if isTrue="{!v.isModalOpen}">
+             
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-box slds-theme--success">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModelsuccess }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01">  
+                             <div class="slds-align_absolute-center">
+                            <img src="{!$Resource.success}" class="img-fluid" alt="Responsive image" />
+                            </div>
+                           </h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-align_absolute-center">
+
+                       <div class="slds-text-heading_medium slds-hyphenate slds-text-color_success"> <b> Success!</b> </div>
+                      
+                        </div>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                   
+                    <footer class="slds-modal__footer">
+                         <div class="slds-align_absolute-center">
+                        <lightning:button variant="neutral"
+                                          label="Ok"
+                                          
+                                          onclick="{! c.closeModelsuccess }"/>
+                        </div>
+                    </footer>
+                   
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+         <aura:if isTrue="{!v.isOpenn}">
+            
+            <!--###### MODAL BOX Start######--> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- ###### MODAL BOX HEADER Start ######-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.close }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Detail Sprint</h2>
+                    </header>
+                    <!--###### MODAL BOX BODY Part Start######-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-modal__content">
+                              <h3 class="slds-section-title--divider">Détail Projet</h3>
+                            <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                  <aura:iteration items="{!v.ShowProjet}" var="conn">
+
+                                 <lightning:input class="slds-hide" aura:id="InputId" label="Id" value="{!v.showProjet.Id}"/>
+                                        
+                                        
+                                        <lightning:input aura:id="Name" label="Nom Sprint" value="{!conn.Name}"/>
+                                        <lightning:textarea aura:id="desc" label="Description Sprint" value="{!conn.description_sprint__c}"/>
+                                        <lightning:input type="Date" aura:id="datedeb" label="date début" value="{!conn.date_debut__c}"/>
+                                        <lightning:input  type="Date" aura:id="datefin" label="date fin" value="{!conn.date_fin__c}"/>
+                                        <lightning:input aura:id="priorite" label="Priorité" value="{!conn.priorite__c}"/>
+                                            
+                                        <lightning:select aura:id="etat" name="Etat" label="Etat" onchange="{!c.getSelectedValueee}">
+                                            <aura:iteration items="{!v.picklistValues}" var="item"> 
+                                                <aura:if isTrue="{!v.ShowProjet.Etat__c == item }"> 
+                                                    <option value="{!item.value}" text="{!item.label}" selected="{!item.value}"></option> 
+                                                    <aura:set attribute="else"> 
+                                                        <option value="{!item.value}" text="{!item.label}" selected="{!item.value}"></option>  
+                                                    </aura:set> 
+                                                </aura:if> 
+                                            </aura:iteration>
+                                        </lightning:select>
+                                            
+                                        <div></div>
+                                            <label class="slds-form-element__label" for="unique-id-of-input"><b>uses stories</b></label>
+                                            
+                                            
+                                           
+                                                 <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                                 
+                                                     <aura:iteration items="{!v.user}" var="sp">
+                                                    <tbody>
+                                                        <tr class="slds-hint-parent">
+                                                            <th data-label="Nom user story" scope="row">
+                                                                <div class="slds-truncate" title="{!sp.Name}">
+                                                 <button type="button" class="btn btn-link btn-sm" onclick="">{!sp.Name}</button>
+                                                                </div>
+                                                            </th>
+                                                        </tr>
+                                                         </tbody>
+                                                         </aura:iteration>
+                                                </table>
+                                                 </aura:iteration>
+                                       </div>
+                                    </div>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <!--###### MODAL BOX FOOTER Part Start ######-->
+                    
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            <!--###### MODAL BOX Part END Here ######-->
+            
+        </aura:if>
+         <aura:if isTrue="{!v.isModalOpen3}">
+            
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-box slds-theme--success">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModelsuccess3 }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01">  
+                            <div class="slds-align_absolute-center">
+                                <img src="{!$Resource.success}" class="img-fluid" alt="Responsive image" />
+                            </div>
+                        </h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-align_absolute-center">
+                            
+                            <div class="slds-text-heading_medium slds-hyphenate slds-text-color_success"> <b> Success</b> </div>
+                            
+                        </div>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    
+                    <footer class="slds-modal__footer">
+                        <div class="slds-align_absolute-center">
+                            <lightning:button variant="neutral"
+                                              label="Ok"
+                                              onclick="{! c.closeModelsuccess3 }"/>
+                        </div>
+                    </footer>
+                    
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+             
+    </div>
+    
+    
+</aura:component>
