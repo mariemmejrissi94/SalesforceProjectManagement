@@ -1,0 +1,4 @@
+<aura:component >
+ <c:dragAndDrop objLabel="tache" objName="Tache__c" objFields="['Name','Ressource__r.Name','Etat__c']" kanbanPicklistField="Etat__c"/>
+
+</aura:component>
