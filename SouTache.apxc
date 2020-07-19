@@ -1,0 +1,226 @@
+public with sharing class SouTache {
+  
+       @AuraEnabled
+    public static List <SouTache__c> loadData(){
+        return [SELECT Name,sumtache__c ,staricon__c,iconstatus__c,desc_soutache__c, percent__c,Progressbar__c,date_debut__c, date_fin__c, Note__c,priorite__c,Etat__c,Tache__r.Name,Tache__r.User_Story__r.Sprint__r.Projet__r.Name,Ressource__r.Name FROM SouTache__c ORDER BY date_fin__c ASC NULLS LAST LIMIT 50];
+    }
+    
+    @AuraEnabled
+    public static list < SouTache__c> fetchsoutache() {
+     list < SouTache__c> returnConList = new List < SouTache__c > ();
+    
+     List < SouTache__c > lstCon = [SELECT  sumtache__c ,staricon__c,Name, iconstatus__c,percent__c,Progressbar__c,desc_soutache__c, date_debut__c, date_fin__c, Note__c,priorite__c,Etat__c,Tache__r.Name,Ressource__r.Name,Tache__r.User_Story__r.Sprint__r.Projet__r.Name FROM SouTache__c ORDER BY date_fin__c ASC NULLS LAST LIMIT 50];
+     // play for loop on lstCon and add each Projet__c to returnConList List.
+     for (SouTache__c c: lstCon) {
+      returnConList.add(c);
+     }
+    // return the List of Projet__cs
+     return returnConList;
+    }
+ 
+  
+    @AuraEnabled
+    public static List < String > deleteRecords(List < String > lstRecordId) {
+     // for store Error Messages  
+     List < String > oErrorMsg = new List < String > ();
+     // Query Records for delete where id in lstRecordId [which is pass from client side controller] 
+     List < SouTache__c > lstDeleteRec = [select Id from SouTache__c where id IN: lstRecordId];
+     
+     // delte Projet__c list with Database.DeleteResult[] database class.
+     // It deletes some queried Projet__cs using <samp class="codeph apex_code">Database.<span class="statement">delete</span></samp> 
+     // with a false second parameter to allow partial processing of records on failure.
+     // Next, it iterates through the results to determine whether the operation was successful or not
+     // for each record. and check if delete Projet__c successful so print msg on debug, 
+     // else add error message to oErrorMsg List and return the list  
+     Database.DeleteResult[] DR_Dels = Database.delete(lstDeleteRec, false);
+     // Iterate through each returned result
+     for (Database.DeleteResult dr: DR_Dels) {
+      if (dr.isSuccess()) {
+         system.debug('successful delete SouTache__c');
+        // Operation was successful
+      } else {
+       // Operation failed, so get all errors   
+       oErrorMsg.add('');
+       for (Database.Error err: dr.getErrors()) {
+        // add Error message to oErrorMsg list and return the list
+        oErrorMsg.add(err.getStatusCode() + ': ' + err.getMessage());
+       }
+      }
+     }
+     return oErrorMsg;
+    
+    }
+  
+    
+  // method for update records after inline editing  
+    @AuraEnabled
+    public static List < SouTache__c > saveAccount(List<SouTache__c> lstAccount) {
+        update lstAccount;
+        return lstAccount;
+    }
+    
+  // method for fetch picklist values dynamic  
+    @AuraEnabled
+    public static List < String > getselectOptions(sObject objObject, string fld) {
+        system.debug('objObject --->' + objObject);
+        system.debug('fld --->' + fld);
+        List < String > allOpts = new list < String > ();
+        // Get the object type of the SObject.
+        Schema.sObjectType objType = objObject.getSObjectType();
+        
+        // Describe the SObject using its object type.
+        Schema.DescribeSObjectResult objDescribe = objType.getDescribe();
+        
+        // Get a map of fields for the SObject
+        map < String, Schema.SObjectField > fieldMap = objDescribe.fields.getMap();
+        
+        // Get the list of picklist values for this field.
+        list < Schema.PicklistEntry > values =
+            fieldMap.get(fld).getDescribe().getPickListValues();
+        
+        // Add these values to the selectoption list.
+        for (Schema.PicklistEntry a: values) {
+            allOpts.add(a.getValue());
+        }
+        system.debug('allOpts ---->' + allOpts);
+        allOpts.sort();
+        return allOpts;
+    }
+    @AuraEnabled
+ public static List < SouTache__c > fetchAccount(String searchKeyWord) {
+  String searchKey = searchKeyWord + '%';
+  List < SouTache__c > returnList = new List <SouTache__c > ();
+  List < SouTache__c > lstOfAccount = [SELECT Name, desc_soutache__c, date_debut__c, date_fin__c, Note__c,priorite__c,Etat__c FROM SouTache__c  where Name LIKE: searchKey LIMIT 50];
+  for (SouTache__c acc: lstOfAccount) {
+   returnList.add(acc);
+  }
+  return returnList;
+ }
+ @AuraEnabled
+ public static List<SouTache__c> searchByName(String searchKey) {
+     String name = '%' + searchKey + '%';
+     return [SELECT Name, desc_soutache__c, date_debut__c, date_fin__c, Note__c,priorite__c,Etat__c FROM SouTache__c  WHERE Name LIKE :name LIMIT 50];
+ }
+ 
+ @AuraEnabled
+ public static SouTache__c searchById ( String tacheid) {
+     return [SELECT Name, desc_soutache__c, date_debut__c, date_fin__c, Note__c,priorite__c,Etat__c FROM SouTache__c  WHERE Id =: tacheid];
+ }
+ @AuraEnabled
+    public static List < sObject > fetchLookUpValues(String searchKeyWord, String ObjectName) {
+        system.debug('ObjectName-->' + ObjectName);
+        String searchKey = searchKeyWord + '%';
+        
+        List < sObject > returnList = new List < sObject > ();
+      
+        // Create a Dynamic SOQL Query For Fetch Record List with LIMIT 5   
+        String sQuery =  'select id, Name from ' +ObjectName + ' where Name LIKE: searchKey order by createdDate DESC limit 5';
+        List < sObject > lstOfRecords = Database.query(sQuery);
+        
+        for (sObject obj: lstOfRecords) {
+            returnList.add(obj);
+        }
+        return returnList;
+    }
+    @AuraEnabled
+    public static list < UserStory__c > fetchuser() {
+     list < UserStory__c > returnConList = new List < UserStory__c > ();
+    
+     List < UserStory__c > lstCon = [SELECT Name, Description_UserStory__c, date_debut__c, date_fin__c,priorite__c, etat__c From UserStory__c ORDER BY date_fin__c ASC NULLS LAST LIMIT 50];
+     // play for loop on lstCon and add each UserStory__c to returnConList List.
+     for (UserStory__c c: lstCon) {
+      returnConList.add(c);
+     }
+    // return the List of UserStory__cs
+     return returnConList;
+    }
+       
+    @AuraEnabled
+    public static String saveTodoRecorde (temp_soustache__c toDoRecord){
+        String message;
+        Database.saveResult sr = Database.insert(toDoRecord,false);
+        if(!sr.isSuccess()){
+            for(Database.error err : sr.getErrors()){
+                message += err.getMessage();
+            }
+        }
+        return message;
+    }
+   
+    @AuraEnabled
+    public static String saveTodoRecord(SouTache__c toDoRecord){
+        String message;
+        Database.saveResult sr = Database.insert(toDoRecord,false);
+        if(!sr.isSuccess()){
+            for(Database.error err : sr.getErrors()){
+                message += err.getMessage();
+            }
+        }
+        return message;
+    }
+   @AuraEnabled
+    public static List<SouTache__c> UpdateRecord(String conid){
+        List<SouTache__c> tacheList = [SELECT Name,desc_soutache__c,date_debut__c,date_fin__c,Note__c,priorite__c,Etat__c FROM SouTache__c WHERE Id =:conid];
+    system.debug('tacheList++ '+tacheList);
+        return tacheList;
+    }  
+@AuraEnabled
+public static SouTache__c updateRecordtache(Id conid,String Naame,String deesc, Date date1, Date date2,String Notee,Integer priorite,String etaat,String task1,String responsable) {
+    SouTache__c c = [SELECT Id,Name,desc_soutache__c,date_debut__c,date_fin__c,Note__c,priorite__c,Etat__c FROM SouTache__c WHERE Id =:conid];
+    c.Name=Naame;
+    c.desc_soutache__c=deesc;
+    c.date_debut__c=date1;
+    c.date_fin__c=date2;
+    c.Note__c=Notee;
+    c.priorite__c=priorite;
+    c.Etat__c=etaat;
+    c.Ressource__c=responsable;
+
+    system.debug('c Project++ '+c);
+        try {
+        if(c != null)
+        update c;
+        } catch (Exception e) {
+        throw new AuraHandledException('Unable to Update Sprint:'  + e.getMessage());
+        }
+        return c;
+        
+        }
+     @AuraEnabled
+       public static List<SouTache__c> showdetail (String conid){
+        return [SELECT Name,desc_soutache__c,date_debut__c,date_fin__c,Note__c,priorite__c,Etat__c FROM SouTache__c WHERE Id =:conid];
+    }  
+  
+    @AuraEnabled        
+    public static List<String> getPickListValuesIntoList(String objectType, String selectedField){
+        List<String> pickListValuesList = new List<String>();
+        Schema.SObjectType convertToObj = Schema.getGlobalDescribe().get(objectType);
+        Schema.DescribeSObjectResult res = convertToObj.getDescribe();
+        Schema.DescribeFieldResult fieldResult = res.fields.getMap().get(selectedField).getDescribe();
+        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+        for( Schema.PicklistEntry pickListVal : ple){
+            pickListValuesList.add(pickListVal.getLabel());
+        }     
+        return pickListValuesList;
+    }
+     @AuraEnabled
+    public static list<SouTache__c> getAllEvents(){
+      list<SouTache__c> eventlist =[SELECT Name,Id,date_debut__c,date_fin__c,desc_soutache__c FROM SouTache__c where createdById=:Userinfo.getUserId()] ;
+      return eventlist;
+    }
+    
+     
+    @AuraEnabled
+    public static void updateEvent(string eventid,string eventdate){
+    system.debug(eventid);
+        system.debug(eventdate);
+        string eventdatelist = eventdate.replace('T',' ');
+       
+  system.debug(eventdatelist);
+    Event e= new event(id = eventid);
+    e.StartDateTime = Date.valueof(eventdatelist);
+    update e;
+   
+    }
+ 
+   }
