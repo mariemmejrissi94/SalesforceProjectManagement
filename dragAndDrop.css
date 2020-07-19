@@ -1,0 +1,29 @@
+.THIS {
+    
+} 
+.THIS .slds-item {
+  border: 1px solid #45aaf2;
+    border-radius: 2rem;
+    background-clip: padding-box;
+    padding: 0.1rem;
+    margin: 0.25rem;
+}
+.THIS .stageContainer{
+ /*   width:320px; */
+    float:left;
+    border: 2px solid #30336b;
+    margin:0.8rem;
+    border-radius: .30rem;
+}
+.THIS .slds-page-header__title {
+    padding: 0rem 0.5rem;
+  background: #ffffff;
+}
+
+
+.THIS .dropZone{
+    min-height:25rem;
+}
+.THIS .slds-box {
+    border: 3px solid red;
+}
